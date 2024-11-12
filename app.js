@@ -24,7 +24,7 @@ function connectToChannel() {
     pubnub.addListener({
         message: function(event) {
         const data = JSON.parse(event.message);
-        const { messageId, chunkIndex, totalChunks, text, audioChunk } = data;
+        const { messageId, chunkIndex, totalChunks, text, audioChunk, name } = data;
 
         // Skip processing if the message has already been processed
         if (processedMessages.has(messageId)) {
@@ -44,7 +44,7 @@ function connectToChannel() {
         if (audioChunks[messageId].receivedChunks === totalChunks) {
             const completeBase64 = audioChunks[messageId].chunks.join('');
             playAudio(completeBase64);
-            displayMessage(text);
+            displayMessage(name, text);
     
             // Mark this message as processed to avoid duplicates
             processedMessages.add(messageId);
@@ -57,10 +57,10 @@ function connectToChannel() {
 }
 
 // Display the original text message
-function displayMessage(text) {
+function displayMessage(name, text) {
     const messagesDiv = document.getElementById('messages');
     const messageElem = document.createElement('p');
-    messageElem.textContent = text;
+    messageElem.textContent = `${name}: ${text}`;
     messagesDiv.appendChild(messageElem);
 }
 
