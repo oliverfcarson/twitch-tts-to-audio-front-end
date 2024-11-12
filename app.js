@@ -6,6 +6,9 @@ const pubnub = new PubNub({
     uuid: 'client'
 });
 
+const audioChunks = {}; // Stores chunks by messageId
+const processedMessages = new Set(); // Tracks fully processed messages
+
 function connectToChannel() {
     const channelName = document.getElementById('channelInput').value;
 
@@ -20,10 +23,36 @@ function connectToChannel() {
 
     pubnub.addListener({
         message: function(event) {
-            const { text, audio } = event.message;
-            displayMessage(text);
-            //playAudio(audio);
+        const data = JSON.parse(event.message);
+        const { messageId, chunkIndex, totalChunks, text, audioChunk } = data;
+
+        // Skip processing if the message has already been processed
+        if (processedMessages.has(messageId)) {
+            return;
         }
+
+        // Initialize storage for this messageId if it doesn’t exist
+        if (!audioChunks[messageId]) {
+            audioChunks[messageId] = { chunks: [], receivedChunks: 0, totalChunks };
+        }
+
+        // Store the chunk and update the count of received chunks
+        audioChunks[messageId].chunks[chunkIndex] = audioChunk;
+        audioChunks[messageId].receivedChunks += 1;
+
+        // If all chunks are received, assemble and play the audio
+        if (audioChunks[messageId].receivedChunks === totalChunks) {
+            const completeBase64 = audioChunks[messageId].chunks.join('');
+            playAudio(completeBase64);
+            displayMessage(text);
+    
+            // Mark this message as processed to avoid duplicates
+            processedMessages.add(messageId);
+
+            // Clean up after playback
+            delete audioChunks[messageId];
+        }
+    }
     });
 }
 
@@ -46,4 +75,10 @@ function playAudio(base64Audio) {
 
     // Clean up URL after playback
     audio.onended = () => URL.revokeObjectURL(url);
+}
+
+function playTextAsSpeech(text) {
+    // Use the Web Speech API to convert text to speech
+    const utterance = new SpeechSynthesisUtterance(text);
+    speechSynthesis.speak(utterance);
 }
