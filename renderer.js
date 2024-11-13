@@ -59,7 +59,7 @@ connectButton.addEventListener('click', () => {
             const completeBase64 = audioChunks[messageId].chunks.join('');
             // playAudio(completeBase64);
             displayMessage(name, text);
-    
+            playAudio(completeBase64);
             // Mark this message as processed to avoid duplicates
             processedMessages.add(messageId);
 
@@ -99,3 +99,29 @@ function playAudio(base64Audio) {
     // Clean up URL after playback
     audio.onended = () => URL.revokeObjectURL(url);
 }
+
+// Populate the dropdown with input devices
+async function populateInputDevices() {
+    try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const inputDevices = devices.filter(device => device.kind === 'audioinput');
+
+        inputDevices.forEach(device => {
+            const option = document.createElement('option');
+            option.value = device.deviceId;
+            option.textContent = device.label || `Device ${device.deviceId}`;
+            deviceDropdown.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error accessing media devices:', error);
+    }
+}
+
+// Update selected device when dropdown value changes
+deviceDropdown.addEventListener('change', () => {
+    const selectedOption = deviceDropdown.options[deviceDropdown.selectedIndex];
+    selectedDevice.textContent = `Selected Device: ${selectedOption.text}`;
+});
+
+// Call the function to populate the dropdown
+populateInputDevices();
