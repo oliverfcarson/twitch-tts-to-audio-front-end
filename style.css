@@ -1,0 +1,76 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    height: 100vh;
+}
+
+#messageContainer {
+    flex: 2; /* Takes 2/3 of the width */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Ensures messages grow upward */
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-right: 1px solid #ccc;
+    overflow: hidden; /* Prevent scrolling */
+}
+
+#messages {
+    flex: 1;
+    display: flex;
+    flex-direction: column; /* Messages grow naturally */
+    justify-content: flex-end; /* New messages at the bottom */
+    padding: 10px;
+    background-color: #fff;
+    overflow: hidden; /* Prevent scrolling */
+}
+
+#settingsContainer {
+    flex: 1; /* Takes 1/3 of the width */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 10px;
+    background-color: #e8e8e8;
+}
+
+#messages {
+    height: 100%; /* Full height of the container */
+    overflow-y: scroll; /* Allow vertical scrolling */
+    scrollbar-width: none; /* For Firefox */
+    -ms-overflow-style: none; /* For IE and Edge */
+    padding: 5px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    display: flex;
+    flex-direction: column; /* Natural top-to-bottom flow */
+    justify-content: flex-end; /* Start from the bottom */
+}
+
+#messages::-webkit-scrollbar {
+    display: none; /* For Chrome, Safari, and Opera */
+}
+
+
+
+#settingsContainer input,
+#settingsContainer button,
+#settingsContainer label {
+    margin-bottom: 10px;
+}
+
+#sliderContainer {
+    margin-top: 20px;
+}
+
+#rateSlider {
+    width: 100%;
+}
+
+h2 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}

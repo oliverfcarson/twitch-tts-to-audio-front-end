@@ -73,8 +73,18 @@ connectButton.addEventListener('click', () => {
 // Display the original text message
 function displayMessage(name, text) {
     const messageElem = document.createElement('p');
-    messagesDiv.textContent = `${name}: ${text}`;
+    messageElem.textContent = `${name}: ${text}`;
+
+    // Append the message to the bottom
     messagesDiv.appendChild(messageElem);
+
+    // Keep the view pinned to the bottom
+    ensureScrollToBottom();
+}
+
+// Helper function to keep the view at the bottom
+function ensureScrollToBottom() {
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
 // Play the audio from the Base64 encoded data
