@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Twitch TTS Client</title>
-    <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.29.11.min.js"></script>
-    <script src="keys.js"></script> <!-- Load keys.js before app.js -->
-    <script src="app.js"></script>
+    <title>Electron PubNub App</title>
 </head>
 <body>
-    <h1>Twitch TTS Client</h1>
-    <input type="text" id="channelInput" placeholder="Enter Twitch Channel Name">
-    <button onclick="connectToChannel()">Connect</button>
+    <h1>PubNub + Electron</h1>
+    <input type="text" id="channelInput" placeholder="Enter Channel Name">
+    <button id="connectButton">Connect</button>
     <div id="messages"></div>
+    <script src="renderer.js"></script>
 </body>
 </html>
