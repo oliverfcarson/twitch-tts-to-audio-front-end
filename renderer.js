@@ -1,15 +1,20 @@
 require('dotenv').config();
 const PubNub = require('pubnub');
 
+const uuid = crypto.randomUUID(); // generate a unique id each time
+
 // Initialize PubNub
 const pubnub = new PubNub({
     publishKey: process.env.PUBNUB_PUBLISH_KEY,
     subscribeKey: process.env.PUBNUB_SUBSCRIBE_KEY,
-    uuid: 'client'
+    uuid: uuid
 });
 
 const audioChunks = {}; // Stores chunks by messageId
 const processedMessages = new Set(); // Tracks fully processed messages
+
+// Track the current subscribed channel
+let currentChannel = null;
 
 // Elements
 const channelInput = document.getElementById('channelInput');
@@ -19,22 +24,34 @@ const rateSlider = document.getElementById('rateSlider');
 
 // Connect to a channel
 connectButton.addEventListener('click', () => {
-    const channelName = channelInput.value.trim();
-    if (!channelName) {
+    const twitchChannelName = channelInput.value.trim();
+    if (!twitchChannelName) {
         alert('Please enter a channel name');
         return;
     }
 
+   // Unsubscribe from the current channel
+    if (currentChannel) {
+        pubnub.unsubscribe({ channels: [currentChannel] });
+        console.log(`Unsubscribed from: ${currentChannel}`);
+    }
+
+    // Clear the messages div
+    messagesDiv.innerHTML = '';
+
+    // Construct the unique channel name using the twitch channel name and the uuid
+    currentChannel = `${twitchChannelName}-${uuid}`;
+
     // Publish the channel name to the backend
     pubnub.publish({
-        channel: 'twitch-channel-requests',
-        message: { channel: channelName }
+        channel: `twitch-channel-requests.${uuid}`,
+        message: { channel: twitchChannelName }
     }).then(() => {
-        messagesDiv.innerHTML += `<p>Published message to: ${channelName}. Waiting for response...</p>`;
+        messagesDiv.innerHTML += `<p>Published message to: ${twitchChannelName}. Waiting for response...</p>`;
     });
 
     // Subscribe to the PubNub channel for the specified Twitch channel
-    pubnub.subscribe({ channels: [channelName] });
+    pubnub.subscribe({ channels: [currentChannel] });
 
     pubnub.addListener({
         message: function(event) {
