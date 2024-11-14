@@ -15,6 +15,7 @@ const processedMessages = new Set(); // Tracks fully processed messages
 const channelInput = document.getElementById('channelInput');
 const connectButton = document.getElementById('connectButton');
 const messagesDiv = document.getElementById('messages');
+const rateSlider = document.getElementById('rateSlider');
 
 // Connect to a channel
 connectButton.addEventListener('click', () => {
@@ -57,9 +58,14 @@ connectButton.addEventListener('click', () => {
         // If all chunks are received, assemble and play the audio
         if (audioChunks[messageId].receivedChunks === totalChunks) {
             const completeBase64 = audioChunks[messageId].chunks.join('');
-            // playAudio(completeBase64);
+            // Always display message
             displayMessage(name, text);
-            playAudio(completeBase64);
+
+            // Determine if the message should be spoken based on rate
+            const ttsRate = parseInt(rateSlider.value, 10);
+            if (Math.random() * 100 <= ttsRate) {
+                playAudio(completeBase64);
+            }
             // Mark this message as processed to avoid duplicates
             processedMessages.add(messageId);
 
