@@ -30,13 +30,13 @@ connectButton.addEventListener('click', () => {
         return;
     }
 
-   // Unsubscribe from the current channel
+   // Unsubscribe from the current channel each time user clicks on "connect" button
     if (currentChannel) {
         pubnub.unsubscribe({ channels: [currentChannel] });
         console.log(`Unsubscribed from: ${currentChannel}`);
     }
 
-    // Clear the messages div
+    // Clear the messages div each time user clicks conenct ubtton
     messagesDiv.innerHTML = '';
 
     // Construct the unique channel name using the twitch channel name and the uuid
@@ -109,14 +109,10 @@ function displayMessage(name, text, isTTSSelected) {
     messagesDiv.appendChild(messageElem);
 
     // Keep the view pinned to the bottom
-    ensureScrollToBottom();
-}
-
-// Helper function to keep the view at the bottom
-function ensureScrollToBottom() {
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
+// Plays the TTS message by routing it to the specificed output source (virtual microphone)
 async function playAudio(base64Audio) {
     const audioBuffer = Uint8Array.from(atob(base64Audio), c => c.charCodeAt(0));
     const blob = new Blob([audioBuffer], { type: 'audio/mp3' });
@@ -149,30 +145,7 @@ async function playAudio(base64Audio) {
     virtualMicAudio.onended = () => URL.revokeObjectURL(url);
 }
 
-
-
-async function playAudioToDevice(base64Audio, deviceId) {
-    const audioBuffer = Uint8Array.from(atob(base64Audio), c => c.charCodeAt(0));
-    const blob = new Blob([audioBuffer], { type: 'audio/mp3' });
-    const url = URL.createObjectURL(blob);
-
-    const audio = new Audio(url);
-
-    try {
-        if (deviceId) {
-            await audio.setSinkId(deviceId); // Route to specific output device
-            console.log(`Routing audio to device ID: ${deviceId}`);
-        } else {
-            console.log('Using default playback device.');
-        }
-    } catch (error) {
-        console.error('Error routing audio:', error);
-    }
-
-    audio.play();
-    audio.onended = () => URL.revokeObjectURL(url);
-}
-
+// Populates the output devices in the dropdown list
 async function populateOutputDevices() {
     const devices = await navigator.mediaDevices.enumerateDevices();
     const outputDeviceDropdown = document.getElementById('outputDeviceDropdown');

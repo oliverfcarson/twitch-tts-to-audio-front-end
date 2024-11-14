@@ -8,14 +8,13 @@ app.on('ready', () => {
         width: 800,
         height: 600,
         webPreferences: {
-            preload: path.join(__dirname, 'renderer.js'), // Enable renderer script
+            preload: path.join(__dirname, 'renderer.js'),
             contextIsolation: false,
             nodeIntegration: true,
         }
     });
 
     mainWindow.loadFile('index.html');
-    //mainWindow.webContents.openDevTools(); // Optional: Open DevTools for debugging
 });
 
 app.on('window-all-closed', () => {
