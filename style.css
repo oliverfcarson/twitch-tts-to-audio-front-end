@@ -84,3 +84,8 @@ h2 {
     padding: 5px;
     font-size: 14px;
 }
+
+.highlight {
+    background-color: #ffeb3b; /* Light yellow */
+    transition: background-color 0.5s ease;
+}

@@ -58,14 +58,18 @@ connectButton.addEventListener('click', () => {
         // If all chunks are received, assemble and play the audio
         if (audioChunks[messageId].receivedChunks === totalChunks) {
             const completeBase64 = audioChunks[messageId].chunks.join('');
-            // Always display message
-            displayMessage(name, text);
-
+            
             // Determine if the message should be spoken based on rate
             const ttsRate = parseInt(rateSlider.value, 10);
-            if (Math.random() * 100 <= ttsRate) {
+            const isTTSSelected = Math.random() * 100 <= ttsRate;
+
+            // Always display message
+            displayMessage(name, text, isTTSSelected);
+
+            if(isTTSSelected) {
                 playAudio(completeBase64);
             }
+                   
             // Mark this message as processed to avoid duplicates
             processedMessages.add(messageId);
 
@@ -77,8 +81,11 @@ connectButton.addEventListener('click', () => {
 });
 
 // Display the original text message
-function displayMessage(name, text) {
+function displayMessage(name, text, isTTSSelected) {
     const messageElem = document.createElement('p');
+    if(isTTSSelected) {
+        messageElem.classList.add('highlight');
+    }
     messageElem.textContent = `${name}: ${text}`;
 
     // Append the message to the bottom
