@@ -1,0 +1,17 @@
+{
+  "name": "twitch-tts-to-audio-front-end",
+  "version": "1.0.0",
+  "description": "Twitch TTS to Audio Front End",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "electron": "^33.2.0",
+    "pubnub": "^8.2.10"
+  }
+}
