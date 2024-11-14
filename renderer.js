@@ -16,11 +16,15 @@ const processedMessages = new Set(); // Tracks fully processed messages
 // Track the current subscribed channel
 let currentChannel = null;
 
+// Track mute state
+let isMuted = false;
+
 // Elements
 const channelInput = document.getElementById('channelInput');
 const connectButton = document.getElementById('connectButton');
 const messagesDiv = document.getElementById('messages');
 const rateSlider = document.getElementById('rateSlider');
+const muteButton = document.getElementById('muteButton');
 
 // Connect to a channel
 connectButton.addEventListener('click', () => {
@@ -136,12 +140,14 @@ async function playAudio(base64Audio) {
     } catch (error) {
         console.error('Error routing audio to virtual microphone:', error);
     }
+    // Audio playback if the button is not muted.
+    if (!isMuted) {
+        const audio = new Audio(url);
+        audio.play();
 
-    // Create the second audio element for the default speakers
-    const defaultSpeakerAudio = new Audio(url);
-    defaultSpeakerAudio.play();
-
-    defaultSpeakerAudio.onended = () => URL.revokeObjectURL(url);
+        // Clean up URL after playback
+        audio.onended = () => URL.revokeObjectURL(url);
+    }
     virtualMicAudio.onended = () => URL.revokeObjectURL(url);
 }
 
@@ -168,4 +174,10 @@ const outputDeviceDropdown = document.getElementById('outputDeviceDropdown');
 outputDeviceDropdown.addEventListener('change', () => {
     const selectedDeviceId = outputDeviceDropdown.value;
     console.log(`Selected output device: ${selectedDeviceId}`);
+});
+
+// Add event listener to toggle mute state
+muteButton.addEventListener('click', () => {
+    isMuted = !isMuted;
+    muteButton.textContent = isMuted ? 'Unmute' : 'Mute';
 });
