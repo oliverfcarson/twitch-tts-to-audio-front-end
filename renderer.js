@@ -88,11 +88,37 @@ function ensureScrollToBottom() {
 }
 
 async function playAudio(base64Audio) {
+    const audioBuffer = Uint8Array.from(atob(base64Audio), c => c.charCodeAt(0));
+    const blob = new Blob([audioBuffer], { type: 'audio/mp3' });
+    const url = URL.createObjectURL(blob);
+
+    // Create the first audio element for the virtual microphone
+    const virtualMicAudio = new Audio(url);
+
+    // Get the selected device ID from the dropdown
     const outputDeviceDropdown = document.getElementById('outputDeviceDropdown');
     const selectedDeviceId = outputDeviceDropdown.value;
 
-    await playAudioToDevice(base64Audio, selectedDeviceId);
+    try {
+        if (selectedDeviceId) {
+            await virtualMicAudio.setSinkId(selectedDeviceId);
+            virtualMicAudio.play();
+            console.log(`Audio routed to virtual microphone: ${selectedDeviceId}`);
+        } else {
+            console.warn('No output device selected. Skipping virtual microphone playback.');
+        }
+    } catch (error) {
+        console.error('Error routing audio to virtual microphone:', error);
+    }
+
+    // Create the second audio element for the default speakers
+    const defaultSpeakerAudio = new Audio(url);
+    defaultSpeakerAudio.play();
+
+    defaultSpeakerAudio.onended = () => URL.revokeObjectURL(url);
+    virtualMicAudio.onended = () => URL.revokeObjectURL(url);
 }
+
 
 
 async function playAudioToDevice(base64Audio, deviceId) {
@@ -140,32 +166,3 @@ outputDeviceDropdown.addEventListener('change', () => {
     const selectedDeviceId = outputDeviceDropdown.value;
     console.log(`Selected output device: ${selectedDeviceId}`);
 });
-
-
-
-
-// Populate the dropdown with input devices
-async function populateInputDevices() {
-    try {
-        const devices = await navigator.mediaDevices.enumerateDevices();
-        const inputDevices = devices.filter(device => device.kind === 'audioinput');
-
-        inputDevices.forEach(device => {
-            const option = document.createElement('option');
-            option.value = device.deviceId;
-            option.textContent = device.label || `Device ${device.deviceId}`;
-            deviceDropdown.appendChild(option);
-        });
-    } catch (error) {
-        console.error('Error accessing media devices:', error);
-    }
-}
-
-// Update selected device when dropdown value changes
-deviceDropdown.addEventListener('change', () => {
-    const selectedOption = deviceDropdown.options[deviceDropdown.selectedIndex];
-    selectedDevice.textContent = `Selected Device: ${selectedOption.text}`;
-});
-
-// Call the function to populate the dropdown
-populateInputDevices();
